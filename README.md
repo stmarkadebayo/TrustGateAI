@@ -1,36 +1,95 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TrustGateAI
 
-## Getting Started
+TrustGateAI is a lightweight, open source toolkit for anti-corruption workflows.
 
-First, run the development server:
+The direction is:
+- no sign-up required for core features
+- small, independently usable modules
+- simple local setup
+- easy contribution paths for other builders
+
+## Current Status
+
+This repository now ships three public modules:
+- `/audit` for multi-file audit-pack analysis plus optional AI explanation
+- `/verify` for document-bundle OCR, country-pack validation, and optional registry assistance
+- `/chat` for grounded compliance Q&A with citations
+
+## Product Direction
+
+The intended feature set is:
+1. audit automation
+2. document verification
+3. compliance chatbot
+
+Core operating rules:
+- each feature is usable without creating an account
+- deterministic analysis runs first
+- AI is optional and env-configured
+- no runtime database is required
+- all analysis results are transient
+
+## Tech Stack
+
+- Next.js 16
+- React 19
+- TypeScript
+- Tailwind CSS v4
+
+## Local Setup
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Copy env values:
+
+```bash
+cp .env.example .env.local
+```
+
+3. Optional AI provider configuration:
+
+```bash
+LLM_API_BASE_URL=
+LLM_API_KEY=
+LLM_API_MODEL=
+```
+
+4. Optional registry adapter configuration for `/verify`:
+
+```bash
+VERIFY_REGISTRY_DATA='{"CERT-001":{"status":"match","detail":"Matched curated registry record","source":"Demo registry"}}'
+```
+
+5. Optional official and assisted registry integrations:
+
+```bash
+SAM_API_BASE_URL="https://api.sam.gov/entity-information/v4/entities"
+SAM_API_KEY=
+CAC_PUBLIC_SEARCH_URL="https://icrp.cac.gov.ng/public-search"
+```
+
+6. Start the app:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Immediate Roadmap
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Expand deterministic rules and document parsers
+- Add deeper field extraction and scan robustness for difficult documents
+- Improve official/assisted verification integrations beyond SAM and CAC
+- Improve corpus coverage and retrieval quality for chat
+- Keep the default local run simple even as features grow
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Contribution Standard
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+When adding features:
+- keep modules loosely coupled
+- avoid mandatory auth unless there is a hard security reason
+- prefer small diffs and explicit behavior
+- document any privacy or retention implications
