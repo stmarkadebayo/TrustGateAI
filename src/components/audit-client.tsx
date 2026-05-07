@@ -3,7 +3,10 @@
 import { useState } from "react";
 import { DownloadButtons } from "@/components/download-buttons";
 import {
+  FieldSelect,
+  FileRow,
   InlineBadge,
+  PrimaryButton,
   ProductPanel,
   StatusBadge,
   UploadDropzone,
@@ -61,6 +64,9 @@ export function AuditClient() {
       return;
     }
 
+    setResult(null);
+    setError(null);
+    setMappingOverride({});
     setFiles((current) => [
       ...current,
       ...Array.from(selected).map((file) => ({
@@ -68,6 +74,30 @@ export function AuditClient() {
         role: guessRoleFromFileName(file.name),
       })),
     ]);
+  }
+
+  function removeFile(index: number) {
+    setResult(null);
+    setError(null);
+    setMappingOverride({});
+    setFiles((current) => current.filter((_, entryIndex) => entryIndex !== index));
+  }
+
+  function updateMode(nextMode: AuditMode) {
+    setMode(nextMode);
+    setResult(null);
+    setError(null);
+    setMappingOverride({});
+  }
+
+  function updateFileRole(index: number, role: AuditFileRole) {
+    setResult(null);
+    setError(null);
+    setFiles((current) =>
+      current.map((entry, entryIndex) =>
+        entryIndex === index ? { ...entry, role } : entry
+      )
+    );
   }
 
   async function submitAudit(overrides?: Record<string, AuditMapping>) {
@@ -138,61 +168,43 @@ export function AuditClient() {
             onFiles={addFiles}
           />
 
-          <select
+          <FieldSelect
             value={mode}
-            onChange={(event) => setMode(event.target.value as AuditMode)}
-            className="w-full rounded-md border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900"
+            onChange={(value) => updateMode(value as AuditMode)}
           >
             <option value="general">General anomaly scan</option>
             <option value="procurement">Procurement audit</option>
             <option value="payments">Payments audit</option>
-          </select>
+          </FieldSelect>
 
           {files.length ? (
             <div className="grid gap-3">
               {files.map((item, index) => (
-                <div
+                <FileRow
                   key={`${item.file.name}-${index}`}
-                  className="grid gap-3 border border-stone-200 bg-white p-4 md:grid-cols-[1fr_190px]"
+                  fileName={item.file.name}
+                  meta={`${item.file.type || "unknown type"} · ${formatFileSize(item.file.size)}`}
+                  onRemove={() => removeFile(index)}
                 >
-                  <div>
-                    <div className="font-medium text-stone-950">{item.file.name}</div>
-                    <div className="text-sm text-stone-500">
-                      {item.file.type || "unknown type"} · {formatFileSize(item.file.size)}
-                    </div>
-                  </div>
-                  <select
+                  <FieldSelect
                     value={item.role}
-                    onChange={(event) =>
-                      setFiles((current) =>
-                        current.map((entry, entryIndex) =>
-                          entryIndex === index
-                            ? { ...entry, role: event.target.value as AuditFileRole }
-                            : entry
-                        )
-                      )
-                    }
-                    className="rounded-md border border-stone-300 px-3 py-2 text-sm text-stone-900"
+                    onChange={(value) => updateFileRole(index, value as AuditFileRole)}
+                    className="px-3 py-2"
                   >
                     {AUDIT_ROLES.map((role) => (
                       <option key={role} value={role}>
                         {role.replace(/_/g, " ")}
                       </option>
                     ))}
-                  </select>
-                </div>
+                  </FieldSelect>
+                </FileRow>
               ))}
             </div>
           ) : null}
 
-          <button
-            type="button"
-            onClick={() => submitAudit()}
-            disabled={loading}
-            className="rounded-md bg-stone-950 px-5 py-3 text-sm font-semibold text-white hover:bg-stone-800 disabled:opacity-60"
-          >
+          <PrimaryButton onClick={() => submitAudit()} disabled={loading}>
             {loading ? "Running audit..." : "Run audit pack"}
-          </button>
+          </PrimaryButton>
           {error ? <p className="text-sm text-red-600">{error}</p> : null}
         </div>
       </ProductPanel>
@@ -244,13 +256,12 @@ export function AuditClient() {
                 </div>
               ))}
           </div>
-          <button
-            type="button"
-            className="mt-5 rounded-md bg-stone-950 px-5 py-3 text-sm font-semibold text-white"
+          <PrimaryButton
+            className="mt-5"
             onClick={() => submitAudit(mappingOverride)}
           >
             Rerun with selected mappings
-          </button>
+          </PrimaryButton>
         </div>
       ) : null}
 

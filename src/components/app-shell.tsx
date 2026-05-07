@@ -27,7 +27,7 @@ export function AppShell({
 export function ToolPage({ label, title, description, children }: ToolPageProps) {
   return (
     <AppShell>
-      <div className="flex items-start justify-between gap-4 border-b border-stone-300/80 pb-6">
+      <div className="flex flex-col gap-4 border-b border-stone-300/80 pb-6 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-800">
             {label}
@@ -41,7 +41,7 @@ export function ToolPage({ label, title, description, children }: ToolPageProps)
         </div>
         <Link
           href="/dashboard"
-          className="shrink-0 rounded-md border border-stone-400 px-3 py-2 text-sm font-semibold text-stone-900 hover:border-stone-700"
+          className="w-fit shrink-0 rounded-md border border-stone-400 px-3 py-2 text-sm font-semibold text-stone-900 hover:border-stone-700"
         >
           Back to modules
         </Link>

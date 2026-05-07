@@ -3,7 +3,10 @@
 import { useState } from "react";
 import { DownloadButtons } from "@/components/download-buttons";
 import {
+  FieldSelect,
+  FileRow,
   InlineBadge,
+  PrimaryButton,
   ProductPanel,
   StatusBadge,
   UploadDropzone,
@@ -34,10 +37,40 @@ export function VerifyClient() {
       return;
     }
 
+    setResult(null);
+    setError(null);
     setFiles((current) => [
       ...current,
       ...Array.from(selected).map((file) => ({ file, docType: "auto" as VerifyDocType })),
     ]);
+  }
+
+  function removeFile(index: number) {
+    setResult(null);
+    setError(null);
+    setFiles((current) => current.filter((_, entryIndex) => entryIndex !== index));
+  }
+
+  function updateCountry(nextCountry: VerifyCountry) {
+    setCountry(nextCountry);
+    setResult(null);
+    setError(null);
+  }
+
+  function updateSubmissionType(nextSubmissionType: VerifySubmissionType) {
+    setSubmissionType(nextSubmissionType);
+    setResult(null);
+    setError(null);
+  }
+
+  function updateDocType(index: number, docType: VerifyDocType) {
+    setResult(null);
+    setError(null);
+    setFiles((current) =>
+      current.map((entry, entryIndex) =>
+        entryIndex === index ? { ...entry, docType } : entry
+      )
+    );
   }
 
   async function submit() {
@@ -94,30 +127,24 @@ export function VerifyClient() {
         </p>
         <div className="mt-5 flex flex-col gap-5">
           <div className="grid gap-4 md:grid-cols-2">
-            <label className="flex flex-col gap-2 text-sm font-medium text-stone-800">
-              Country pack
-              <select
-                value={country}
-                onChange={(event) => setCountry(event.target.value as VerifyCountry)}
-                className="w-full rounded-md border border-stone-300 bg-white px-4 py-3 text-sm font-normal text-stone-900"
-              >
-                <option value="nigeria">Nigeria</option>
-                <option value="us">United States</option>
-              </select>
-            </label>
-            <label className="flex flex-col gap-2 text-sm font-medium text-stone-800">
-              Packet type
-              <select
-                value={submissionType}
-                onChange={(event) => setSubmissionType(event.target.value as VerifySubmissionType)}
-                className="w-full rounded-md border border-stone-300 bg-white px-4 py-3 text-sm font-normal text-stone-900"
-              >
-                <option value="vendor_onboarding">Vendor onboarding pack</option>
-                <option value="invoice_support">Invoice support pack</option>
-                <option value="authorization_review">Authorization review</option>
-                <option value="generic_packet">Generic compliance packet</option>
-              </select>
-            </label>
+            <FieldSelect
+              label="Country pack"
+              value={country}
+              onChange={(value) => updateCountry(value as VerifyCountry)}
+            >
+              <option value="nigeria">Nigeria</option>
+              <option value="us">United States</option>
+            </FieldSelect>
+            <FieldSelect
+              label="Packet type"
+              value={submissionType}
+              onChange={(value) => updateSubmissionType(value as VerifySubmissionType)}
+            >
+              <option value="vendor_onboarding">Vendor onboarding pack</option>
+              <option value="invoice_support">Invoice support pack</option>
+              <option value="authorization_review">Authorization review</option>
+              <option value="generic_packet">Generic compliance packet</option>
+            </FieldSelect>
           </div>
 
           <UploadDropzone
@@ -132,28 +159,16 @@ export function VerifyClient() {
           {files.length ? (
             <div className="grid gap-3">
               {files.map((item, index) => (
-                <div
+                <FileRow
                   key={`${item.file.name}-${index}`}
-                  className="grid gap-3 border border-stone-200 bg-white p-4 md:grid-cols-[1fr_190px]"
+                  fileName={item.file.name}
+                  meta={`${item.file.type || "unknown type"} · ${formatFileSize(item.file.size)}`}
+                  onRemove={() => removeFile(index)}
                 >
-                  <div>
-                    <div className="font-medium text-stone-950">{item.file.name}</div>
-                    <div className="text-sm text-stone-500">
-                      {item.file.type || "unknown type"} · {formatFileSize(item.file.size)}
-                    </div>
-                  </div>
-                  <select
+                  <FieldSelect
                     value={item.docType}
-                    onChange={(event) =>
-                      setFiles((current) =>
-                        current.map((entry, entryIndex) =>
-                          entryIndex === index
-                            ? { ...entry, docType: event.target.value as VerifyDocType }
-                            : entry
-                        )
-                      )
-                    }
-                    className="rounded-md border border-stone-300 px-3 py-2 text-sm text-stone-900"
+                    onChange={(value) => updateDocType(index, value as VerifyDocType)}
+                    className="px-3 py-2"
                   >
                     <option value="auto">Auto-detect</option>
                     <option value="invoice">Invoice</option>
@@ -162,20 +177,15 @@ export function VerifyClient() {
                     <option value="registration">Registration support</option>
                     <option value="tax_form">Tax form</option>
                     <option value="insurance">Insurance</option>
-                  </select>
-                </div>
+                  </FieldSelect>
+                </FileRow>
               ))}
             </div>
           ) : null}
 
-          <button
-            type="button"
-            onClick={submit}
-            disabled={loading}
-            className="rounded-md bg-stone-950 px-5 py-3 text-sm font-semibold text-white hover:bg-stone-800 disabled:opacity-60"
-          >
+          <PrimaryButton onClick={submit} disabled={loading}>
             {loading ? "Verifying..." : "Run verification bundle"}
-          </button>
+          </PrimaryButton>
           {error ? <p className="text-sm text-red-600">{error}</p> : null}
         </div>
       </ProductPanel>

@@ -83,6 +83,93 @@ export function UploadDropzone({
   );
 }
 
+export function FieldSelect({
+  label,
+  value,
+  onChange,
+  children,
+  className = "",
+}: {
+  label?: string;
+  value: string;
+  onChange: (value: string) => void;
+  children: ReactNode;
+  className?: string;
+}) {
+  const select = (
+    <select
+      value={value}
+      onChange={(event) => onChange(event.target.value)}
+      className={`w-full rounded-md border border-stone-300 bg-white px-4 py-3 text-sm font-normal text-stone-900 ${className}`}
+    >
+      {children}
+    </select>
+  );
+
+  if (!label) {
+    return select;
+  }
+
+  return (
+    <label className="flex flex-col gap-2 text-sm font-medium text-stone-800">
+      {label}
+      {select}
+    </label>
+  );
+}
+
+export function FileRow({
+  fileName,
+  meta,
+  children,
+  onRemove,
+}: {
+  fileName: string;
+  meta: string;
+  children: ReactNode;
+  onRemove: () => void;
+}) {
+  return (
+    <div className="grid gap-3 border border-stone-200 bg-white p-4 md:grid-cols-[1fr_190px_auto] md:items-center">
+      <div>
+        <div className="font-medium text-stone-950">{fileName}</div>
+        <div className="text-sm text-stone-500">{meta}</div>
+      </div>
+      {children}
+      <button
+        type="button"
+        onClick={onRemove}
+        className="w-fit rounded-md border border-stone-300 px-3 py-2 text-sm font-semibold text-stone-700 hover:border-red-300 hover:text-red-700"
+      >
+        Remove
+      </button>
+    </div>
+  );
+}
+
+export function PrimaryButton({
+  children,
+  disabled,
+  onClick,
+  className = "",
+}: {
+  children: ReactNode;
+  disabled?: boolean;
+  onClick: () => void;
+  className?: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className={`rounded-md bg-stone-950 px-5 py-3 text-sm font-semibold text-white hover:bg-stone-800 disabled:opacity-60 ${className}`}
+    >
+      {children}
+    </button>
+  );
+}
+
 export function formatFileSize(bytes: number) {
   if (bytes < 1024) {
     return `${bytes} B`;
