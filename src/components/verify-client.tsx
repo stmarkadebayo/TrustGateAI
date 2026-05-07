@@ -2,6 +2,13 @@
 
 import { useState } from "react";
 import { DownloadButtons } from "@/components/download-buttons";
+import {
+  InlineBadge,
+  ProductPanel,
+  StatusBadge,
+  UploadDropzone,
+  formatFileSize,
+} from "@/components/product-ui";
 import type {
   VerificationResult,
   VerifyCountry,
@@ -77,39 +84,49 @@ export function VerifyClient() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-zinc-900">Upload a verification bundle</h2>
-        <p className="mt-2 text-sm text-zinc-600">
-          Upload the primary document and its supporting packet. TrustGateAI will run bundle-level checks using the selected country pack and submission type.
+      <ProductPanel>
+        <h2 className="text-xl font-semibold tracking-tight text-stone-950">
+          Upload verification bundle
+        </h2>
+        <p className="mt-2 text-sm leading-6 text-stone-600">
+          Add a primary document and any supporting files. The selected country
+          and packet type control the expected evidence checks.
         </p>
-        <div className="mt-4 flex flex-col gap-4">
+        <div className="mt-5 flex flex-col gap-5">
           <div className="grid gap-4 md:grid-cols-2">
-            <select
-              value={country}
-              onChange={(event) => setCountry(event.target.value as VerifyCountry)}
-              className="w-full rounded-xl border border-zinc-300 px-4 py-3 text-sm"
-            >
-              <option value="nigeria">Nigeria</option>
-              <option value="us">United States</option>
-            </select>
-            <select
-              value={submissionType}
-              onChange={(event) => setSubmissionType(event.target.value as VerifySubmissionType)}
-              className="w-full rounded-xl border border-zinc-300 px-4 py-3 text-sm"
-            >
-              <option value="vendor_onboarding">Vendor onboarding pack</option>
-              <option value="invoice_support">Invoice support pack</option>
-              <option value="authorization_review">Authorization review</option>
-              <option value="generic_packet">Generic compliance packet</option>
-            </select>
+            <label className="flex flex-col gap-2 text-sm font-medium text-stone-800">
+              Country pack
+              <select
+                value={country}
+                onChange={(event) => setCountry(event.target.value as VerifyCountry)}
+                className="w-full rounded-md border border-stone-300 bg-white px-4 py-3 text-sm font-normal text-stone-900"
+              >
+                <option value="nigeria">Nigeria</option>
+                <option value="us">United States</option>
+              </select>
+            </label>
+            <label className="flex flex-col gap-2 text-sm font-medium text-stone-800">
+              Packet type
+              <select
+                value={submissionType}
+                onChange={(event) => setSubmissionType(event.target.value as VerifySubmissionType)}
+                className="w-full rounded-md border border-stone-300 bg-white px-4 py-3 text-sm font-normal text-stone-900"
+              >
+                <option value="vendor_onboarding">Vendor onboarding pack</option>
+                <option value="invoice_support">Invoice support pack</option>
+                <option value="authorization_review">Authorization review</option>
+                <option value="generic_packet">Generic compliance packet</option>
+              </select>
+            </label>
           </div>
 
-          <input
-            type="file"
+          <UploadDropzone
+            id="verify-files"
+            label="Upload documents"
+            title="Drop verification files here"
+            description="PDF, PNG, JPG, or JPEG. Add the full supporting packet when available."
             accept=".pdf,.png,.jpg,.jpeg"
-            multiple
-            onChange={(event) => addFiles(event.target.files)}
-            className="block w-full text-sm text-zinc-700"
+            onFiles={addFiles}
           />
 
           {files.length ? (
@@ -117,11 +134,13 @@ export function VerifyClient() {
               {files.map((item, index) => (
                 <div
                   key={`${item.file.name}-${index}`}
-                  className="grid gap-3 rounded-xl border border-zinc-200 p-4 md:grid-cols-[1fr_220px]"
+                  className="grid gap-3 border border-stone-200 bg-white p-4 md:grid-cols-[1fr_190px]"
                 >
                   <div>
-                    <div className="font-medium text-zinc-900">{item.file.name}</div>
-                    <div className="text-sm text-zinc-500">{item.file.type || "unknown type"}</div>
+                    <div className="font-medium text-stone-950">{item.file.name}</div>
+                    <div className="text-sm text-stone-500">
+                      {item.file.type || "unknown type"} · {formatFileSize(item.file.size)}
+                    </div>
                   </div>
                   <select
                     value={item.docType}
@@ -134,7 +153,7 @@ export function VerifyClient() {
                         )
                       )
                     }
-                    className="rounded-xl border border-zinc-300 px-3 py-2 text-sm"
+                    className="rounded-md border border-stone-300 px-3 py-2 text-sm text-stone-900"
                   >
                     <option value="auto">Auto-detect</option>
                     <option value="invoice">Invoice</option>
@@ -153,31 +172,36 @@ export function VerifyClient() {
             type="button"
             onClick={submit}
             disabled={loading}
-            className="rounded-full bg-zinc-900 px-5 py-3 text-sm font-semibold text-white hover:bg-zinc-800 disabled:opacity-60"
+            className="rounded-md bg-stone-950 px-5 py-3 text-sm font-semibold text-white hover:bg-stone-800 disabled:opacity-60"
           >
             {loading ? "Verifying..." : "Run verification bundle"}
           </button>
           {error ? <p className="text-sm text-red-600">{error}</p> : null}
         </div>
-      </div>
+      </ProductPanel>
 
       {result ? (
         <div className="flex flex-col gap-6">
-          <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+          <ProductPanel>
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
-                <h3 className="text-xl font-semibold text-zinc-900">{result.summary.title}</h3>
-                <p className="mt-2 text-sm text-zinc-600">{result.summary.detail}</p>
+                <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-800">
+                  Verification result
+                </p>
+                <h3 className="mt-2 text-2xl font-semibold tracking-tight text-stone-950">
+                  {result.summary.title}
+                </h3>
+                <p className="mt-2 text-sm leading-6 text-stone-600">{result.summary.detail}</p>
               </div>
-              <div className="rounded-2xl bg-zinc-100 px-4 py-3 text-sm text-zinc-800 capitalize">
+              <StatusBadge>
                 Status: <span className="font-semibold">{result.status}</span>
-              </div>
+              </StatusBadge>
             </div>
-          </div>
+          </ProductPanel>
 
-          <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-            <h3 className="text-lg font-semibold text-zinc-900">Bundle coverage</h3>
-            <ul className="mt-3 list-disc pl-5 text-sm text-zinc-600">
+          <ProductPanel>
+            <h3 className="text-lg font-semibold tracking-tight text-stone-950">Bundle coverage</h3>
+            <ul className="mt-3 list-disc pl-5 text-sm leading-6 text-stone-600">
               {result.coverageGaps.length ? (
                 result.coverageGaps.map((gap) => <li key={gap.id}>{gap.title}: {gap.detail}</li>)
               ) : (
@@ -185,8 +209,8 @@ export function VerifyClient() {
               )}
             </ul>
             <div className="mt-4">
-              <h4 className="text-sm font-semibold text-zinc-900">Missing expected documents</h4>
-              <ul className="mt-2 list-disc pl-5 text-sm text-zinc-600">
+              <h4 className="text-sm font-semibold text-stone-950">Missing expected documents</h4>
+              <ul className="mt-2 list-disc pl-5 text-sm leading-6 text-stone-600">
                 {result.missingDocuments.length ? (
                   result.missingDocuments.map((doc) => <li key={doc}>{doc}</li>)
                 ) : (
@@ -194,51 +218,51 @@ export function VerifyClient() {
                 )}
               </ul>
             </div>
-          </div>
+          </ProductPanel>
 
-          <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-            <h3 className="text-lg font-semibold text-zinc-900">Bundle files</h3>
+          <ProductPanel>
+            <h3 className="text-lg font-semibold tracking-tight text-stone-950">Bundle files</h3>
             <div className="mt-4 grid gap-4">
               {result.fileResults.map((file) => (
-                <div key={file.fileName} className="rounded-xl border border-zinc-200 p-4">
+                <div key={file.fileName} className="border border-stone-200 bg-white p-4">
                   <div className="flex items-center justify-between gap-4">
-                    <div className="font-medium text-zinc-900">{file.fileName}</div>
-                    <div className="text-xs uppercase tracking-wide text-zinc-500">{file.detectedDocType}</div>
+                    <div className="font-medium text-stone-950">{file.fileName}</div>
+                    <InlineBadge>{file.detectedDocType}</InlineBadge>
                   </div>
-                  <div className="mt-2 text-xs text-zinc-500">
+                  <div className="mt-2 text-xs text-stone-500">
                     Profiles: {file.validatorProfiles.join(", ") || "none"}
                   </div>
-                  <div className="mt-1 text-xs text-zinc-500">
+                  <div className="mt-1 text-xs text-stone-500">
                     Registry: {file.registryResult.status} {file.registryResult.source ? `(${file.registryResult.source})` : ""}
                   </div>
                   <div className="mt-3 grid gap-3 md:grid-cols-2">
                     {file.extractedFields.length ? (
                       file.extractedFields.map((field) => (
-                        <div key={`${file.fileName}-${field.key}-${field.value}`} className="rounded-lg bg-zinc-50 p-3 text-sm">
-                          <div className="font-medium text-zinc-900">{field.key}</div>
-                          <div className="mt-1 text-zinc-600">{field.value}</div>
+                        <div key={`${file.fileName}-${field.key}-${field.value}`} className="bg-[#f7f5ef] p-3 text-sm">
+                          <div className="font-medium text-stone-950">{field.key}</div>
+                          <div className="mt-1 text-stone-600">{field.value}</div>
                         </div>
                       ))
                     ) : (
-                      <div className="text-sm text-zinc-600">No structured fields extracted.</div>
+                      <div className="text-sm text-stone-600">No structured fields extracted.</div>
                     )}
                   </div>
                 </div>
               ))}
             </div>
-          </div>
+          </ProductPanel>
 
-          <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-            <h3 className="text-lg font-semibold text-zinc-900">Integrity findings</h3>
+          <ProductPanel>
+            <h3 className="text-lg font-semibold tracking-tight text-stone-950">Integrity findings</h3>
             <div className="mt-4 flex flex-col gap-4">
               {result.findings.map((finding) => (
-                <div key={finding.id} className="rounded-xl border border-zinc-200 p-4">
+                <div key={finding.id} className="border border-stone-200 bg-white p-4">
                   <div className="flex items-center justify-between gap-4">
-                    <div className="font-medium text-zinc-900">{finding.title}</div>
-                    <div className="text-xs uppercase tracking-wide text-zinc-500">{finding.severity}</div>
+                    <div className="font-medium text-stone-950">{finding.title}</div>
+                    <InlineBadge>{finding.severity}</InlineBadge>
                   </div>
-                  <p className="mt-2 text-sm text-zinc-600">{finding.detail}</p>
-                  <ul className="mt-3 list-disc pl-5 text-sm text-zinc-600">
+                  <p className="mt-2 text-sm leading-6 text-stone-600">{finding.detail}</p>
+                  <ul className="mt-3 list-disc pl-5 text-sm leading-6 text-stone-600">
                     {finding.evidence.map((item) => (
                       <li key={item}>{item}</li>
                     ))}
@@ -246,12 +270,12 @@ export function VerifyClient() {
                 </div>
               ))}
             </div>
-          </div>
+          </ProductPanel>
 
-          <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-            <h3 className="text-lg font-semibold text-zinc-900">AI explanation</h3>
-            <p className="mt-3 whitespace-pre-wrap text-sm text-zinc-600">{result.aiNotes.content}</p>
-          </div>
+          <ProductPanel>
+            <h3 className="text-lg font-semibold tracking-tight text-stone-950">AI explanation</h3>
+            <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-stone-600">{result.aiNotes.content}</p>
+          </ProductPanel>
 
           <DownloadButtons
             json={result.exports.json}

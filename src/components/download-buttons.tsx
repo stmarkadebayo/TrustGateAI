@@ -18,17 +18,17 @@ function triggerDownload(content: string, fileName: string, type: string) {
 
 export function DownloadButtons({ json, markdown, baseName }: Props) {
   return (
-    <div className="flex flex-wrap gap-3">
+    <div className="flex flex-wrap gap-3 border border-stone-300 bg-[#fffdf7] p-4">
       <button
         type="button"
-        className="rounded-full border border-zinc-300 px-4 py-2 text-sm text-zinc-800 hover:border-zinc-400"
+        className="rounded-md border border-stone-400 px-4 py-2 text-sm font-semibold text-stone-900 hover:border-stone-700"
         onClick={() => triggerDownload(json, `${baseName}.json`, "application/json")}
       >
         Download JSON
       </button>
       <button
         type="button"
-        className="rounded-full border border-zinc-300 px-4 py-2 text-sm text-zinc-800 hover:border-zinc-400"
+        className="rounded-md border border-stone-400 px-4 py-2 text-sm font-semibold text-stone-900 hover:border-stone-700"
         onClick={() => triggerDownload(markdown, `${baseName}.md`, "text/markdown")}
       >
         Download Markdown
