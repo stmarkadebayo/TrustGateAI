@@ -2,58 +2,75 @@ import Link from "next/link";
 
 export default function DashboardPage() {
   return (
-    <div className="min-h-screen bg-zinc-50 px-6 py-16">
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-8">
-        <div className="flex flex-col gap-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-zinc-500">
-            Public Workspace
+    <div className="min-h-screen bg-[#f7f5ef] px-5 py-8 text-stone-950 sm:px-8">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-8">
+        <header className="flex items-center justify-between border-b border-stone-300/80 pb-5">
+          <Link href="/" className="text-base font-semibold tracking-tight">
+            TrustGateAI
+          </Link>
+          <Link
+            href="/"
+            className="rounded-md border border-stone-400 px-3 py-2 text-sm font-semibold text-stone-900 hover:border-stone-700"
+          >
+            Home
+          </Link>
+        </header>
+
+        <div className="max-w-3xl">
+          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-800">
+            Workspace
           </p>
-          <h1 className="text-3xl font-semibold text-zinc-900">
-            Open modules, no account required.
+          <h1 className="mt-3 text-4xl font-semibold tracking-tight text-stone-950 sm:text-5xl">
+            Choose a review workflow.
           </h1>
-          <p className="max-w-3xl text-sm text-zinc-600">
-            This workspace is the public surface for TrustGateAI. The product is
-            being repositioned around lightweight tools that are easy to use,
-            easy to host, and easy for contributors to extend.
+          <p className="mt-4 text-base leading-7 text-stone-700">
+            Use TrustGateAI to review transaction files, inspect document
+            bundles, or ask compliance questions with cited answers. The core
+            checks run without an account.
           </p>
         </div>
 
-        <section className="grid gap-6 md:grid-cols-3">
+        <section className="grid gap-px overflow-hidden border border-stone-300 bg-stone-300 md:grid-cols-3">
           {[
             {
-              title: "Audit Automation",
-              body: "Upload CSV, XLSX, or JSON records, infer columns, run deterministic fraud rules, and export findings.",
+              title: "Audit files",
+              body: "Upload CSV, XLSX, or JSON records, infer columns, run fraud and control rules, and export findings.",
               href: "/audit",
+              action: "Run audit",
             },
             {
-              title: "Document Verification",
-              body: "Extract text from PDFs and images, classify the document, run integrity checks, and attach registry evidence when configured.",
+              title: "Verify documents",
+              body: "Extract text from PDFs and images, classify documents, check required fields, and attach registry evidence when configured.",
               href: "/verify",
+              action: "Verify bundle",
             },
             {
-              title: "Compliance Chatbot",
-              body: "Answer grounded compliance questions from a bundled local handbook corpus with explicit supporting passages.",
+              title: "Ask compliance questions",
+              body: "Get grounded answers from the bundled compliance corpus with supporting passages shown beside the answer.",
               href: "/chat",
+              action: "Open assistant",
             },
           ].map((module) => (
             <Link
               key={module.title}
               href={module.href}
-              className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm"
+              className="group bg-[#fffdf7] p-6 hover:bg-white"
             >
-              <h2 className="text-lg font-semibold text-zinc-900">
+              <h2 className="text-xl font-semibold tracking-tight text-stone-950">
                 {module.title}
               </h2>
-              <p className="mt-2 text-sm text-zinc-600">{module.body}</p>
-              <div className="mt-4 text-sm font-medium text-zinc-900">Open module</div>
+              <p className="mt-3 text-sm leading-6 text-stone-600">{module.body}</p>
+              <div className="mt-5 text-sm font-semibold text-emerald-900">
+                {module.action}
+              </div>
             </Link>
           ))}
         </section>
 
-        <div className="rounded-2xl border border-dashed border-zinc-300 bg-white p-6 text-sm text-zinc-600">
-          All modules are public by default. AI explanations and registry checks
-          improve when environment-based adapters are configured, but the core
-          deterministic flows still work without them.
+        <div className="border border-stone-300 bg-[#fffdf7] p-5 text-sm leading-6 text-stone-600">
+          Optional AI explanations and registry checks improve when production
+          environment adapters are configured. The deterministic review flows
+          still work without them.
         </div>
       </div>
     </div>
